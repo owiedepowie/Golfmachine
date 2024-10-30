@@ -22,18 +22,19 @@ const int prec = 100; // bij het draaien van de draaiknop met x-aantal graden ne
 // variabelen
 int modus = 0;
 int nieuweModus = 0; // nieuweModus is gelijk aan de startmodus; 0 = modus1, 1 = modus2, 2 = modus3 
-int knopStatus[3] = {0, 0, 0}; 
+int knopStatus[3]; 
 int knopPin[3] = {knopPin1, knopPin2, knopPin3};
 int draaiHoek[3] = {draaiHoek1, draaiHoek2, draaiHoek3};
 gm gm;
 void setup() {
   Serial.begin(9600);
   gm.initPins(dirPin, stepPin, knopPin1, knopPin2, knopPin3);
+  
   for (int i = 0; i < 3; i++) {
-    bool isKnopIngedrukt = gm.readButton(knopPin[i], knopStatus[i]);
-    if(isKnopIngedrukt) {
-      knopStatus[i] = HIGH;
-    } else {knopStatus[i] = LOW;}
+    knopStatus[i] = digitalRead(knopPin[i]);
+    if (knopStatus[i] == LOW) {
+      nieuweModus = i;
+    }
   }
 }
 
@@ -51,11 +52,12 @@ void draaiMotor(bool cw) {
     long snelheid = gm.calcSpeed(A0, maxDel, minDel, prec);
     gm.stepmotor(stepPin, dirPin, snelheid, cw);
     for (int j = 0; j < 3; j++) {
-    bool isKnopIngedrukt = gm.readButton(knopPin[j], knopStatus[j]);
-    if(isKnopIngedrukt) {
+    knopStatus[j] = digitalRead(knopPin[j]);
+    if (knopStatus[j] == LOW) {
       nieuweModus = j;
-      knopStatus[j] = HIGH;
-    } else {knopStatus[j] = LOW;}
+      Serial.print("nieuwe modus = "); Serial.println(nieuweModus);
+    }
   }
   }
+
 }
