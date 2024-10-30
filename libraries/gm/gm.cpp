@@ -6,35 +6,38 @@ gm::gm() {
   
 }
 
-bool gm::readButton(byte buttonPin, int currentButtonState) {
-  int lastButtonState = currentButtonState;
-  currentButtonState = digitalRead(buttonPin);
-  if(lastButtonState == HIGH && currentButtonState == LOW) {
-    return true;
-  } else {return false;}
-}
-
-
-void gm::calcSpeed(byte potPin, long maxDel, long minDel, long prec) {
-  if (maxDel<=minDel) {return;}
-  if (minDel<500) {return;} 
+long gm::calcSpeed(byte potPin, long maxDel, long minDel, long prec, bool esp32) {
+  int analogMax = 1023;
+  if (esp32) {analogMax = 4095;}
+  if (maxDel<=minDel) {return Serial.println("Error: Maximum delay must be greater than minimum delay");}
+  if (minDel<500) {Serial.println("Error: Minimum delay must be greater or equal to 500");} 
   int analogValue = analogRead(potPin);
   int calcMaxDel = maxDel/prec;
   int calcMinDel = minDel/prec;
-  return prec*map(analogValue, 0, 1023, calcMaxDel, calcMinDel);
+  return prec*map(analogValue, 0, analogMax, calcMaxDel, calcMinDel);
 }
 
-void gm::stepmotor(byte stepPin, byte dirPin, long SPR, long v, int a, bool cw) {
+void gm::stepmotor(byte stepPin, byte dirPin, long v, bool cw) {
+  
   if (cw) {
     digitalWrite(dirPin, HIGH);
   }
   else {
     digitalWrite(dirPin, LOW);
   }
-  for (int i = 0; i < (SPR/360)*a; i++) {
+  digitalWrite(stepPin, LOW);
   digitalWrite(stepPin, HIGH);
     delayMicroseconds(v);
     digitalWrite(stepPin, LOW);
     delayMicroseconds(v);
-  }
+  
+
+}
+
+void gm::initPins(byte dirPin, byte stepPin, byte buttonPin1, byte buttonPin2, byte buttonPin3) {
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+  pinMode(buttonPin1, INPUT_PULLUP);
+  pinMode(buttonPin2, INPUT_PULLUP);
+  pinMode(buttonPin3, INPUT_PULLUP);
 }
