@@ -8,17 +8,19 @@ class gm {
   private:
     byte stepPin;
     byte dirPin;
-    byte buttonPin;
+    byte buttonPin1;
+    byte buttonPin2;
+    byte buttonPin3;
     byte potPin;
 
   public:
   gm();
-  bool readButton(byte buttonPin, int currentButtonState);
 
-  void calcSpeed(byte potPin, long maxDel, long minDel, long prec);
+  long calcSpeed(byte potPin, long maxDel, long minDel, long prec, bool esp32);
 
-  void stepmotor(byte stepPin, byte dirPin, long SPR, long v, int a, bool cw);
+  void stepmotor(byte stepPin, byte dirPin, long v, bool cw);
   
+  void initPins(byte dirPin, byte stepPin, byte buttonPin1, byte buttonPin2, byte buttonPin3);
 };
 
 #endif
