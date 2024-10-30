@@ -1,13 +1,23 @@
 #include "gm.h"
+#include <Arduino.h>
 
+// pins ESP32
+#define potPin 4
+#define dirPin 5
+#define stepPin 6
+#define knopPin1 0
+#define knopPin2 2
+#define knopPin3 1
 
-// pins
+/* pins Arduino UNO
+#define potPin 0
 #define dirPin 2
 #define stepPin 3
 #define knopPin1 5
 #define knopPin2 6
 #define knopPin3 7
-
+*/
+bool esp32 = true; // Zet deze bool op true wanneer je een esp32 gebruikt en op false wanneer je een arduino gebruikt. (i.v.m. met ander analog bit-number)
 const long stepsPerRevolution = 7200; // aantal stappen per rondje, liefst deelbaar door 360 voor geen afrondingsproblemen
 // standaard instellingen voor modi
 const int draaiHoek1 = 30; // hoek in graden; 0 < draaiHoek <= 90; modus 1
@@ -27,9 +37,8 @@ int knopPin[3] = {knopPin1, knopPin2, knopPin3};
 int draaiHoek[3] = {draaiHoek1, draaiHoek2, draaiHoek3};
 gm gm;
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   gm.initPins(dirPin, stepPin, knopPin1, knopPin2, knopPin3);
-  
   for (int i = 0; i < 3; i++) {
     knopStatus[i] = digitalRead(knopPin[i]);
     if (knopStatus[i] == LOW) {
@@ -44,12 +53,11 @@ void loop() {
   draaiMotor(false); // draai tegen de klok in
   draaiMotor(true); // draai met de klok mee
 }
-
 void draaiMotor(bool cw) {
   modus = nieuweModus;
-  if (draaiHoek[modus] > 90) {return;}
+  if (draaiHoek[modus] <= 90) {
   for (int i = 0; i <(stepsPerRevolution/360)*draaiHoek[modus]; i++) {
-    long snelheid = gm.calcSpeed(A0, maxDel, minDel, prec);
+    long snelheid = gm.calcSpeed(potPin, maxDel, minDel, prec, esp32);
     gm.stepmotor(stepPin, dirPin, snelheid, cw);
     for (int j = 0; j < 3; j++) {
     knopStatus[j] = digitalRead(knopPin[j]);
@@ -58,6 +66,7 @@ void draaiMotor(bool cw) {
       Serial.print("nieuwe modus = "); Serial.println(nieuweModus);
     }
   }
+  
   }
-
+  } 
 }
