@@ -7,6 +7,8 @@
 #define knopPin2 41
 #define knopPin3 42
 
+#define outputPerc  50
+
 typedef enum
 {
   ST_IDLE,
@@ -39,7 +41,7 @@ void setup()
   serial.begin(115200/*, SERIAL_8N1, -1, -1*/);
   serial.println("Start-up\r\n");
   
-  //gm.setOutputPercentage(70);
+  gm.setOutputPercentage(outputPerc);
 }
 
 void loop() 
