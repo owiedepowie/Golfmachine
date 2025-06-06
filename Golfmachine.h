@@ -86,8 +86,7 @@ class Stepper {
     Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2);
     Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
                                  int motor_pin_3, int motor_pin_4,
-                                 int button_pin_1, int button_pin_2,
-                                 int button_pin_3, int potentiometer_pin,
+                                 int button_pin, int potentiometer_pin,
                                  int minimum_velocity, int maximum_velocity,
                                  int bound);
     Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
@@ -129,14 +128,11 @@ class Stepper {
     int motor_pin_3;
     int motor_pin_4;
     int motor_pin_5;          // Only 5 phase motor
-    int button_pin_1;
-    int button_pin_2;
-    int button_pin_3;
+    int button_pin;
     int potentiometer_pin;
     int minimum_velocity;
     int maximum_velocity;
     int bound;
-    int mode;
     int counter;
     int lastButtonState;
     int currentButtonState;

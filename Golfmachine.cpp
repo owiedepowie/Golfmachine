@@ -115,8 +115,7 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2)
  */
 Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
                                       int motor_pin_3, int motor_pin_4,
-                                      int button_pin_1, int button_pin_2,
-                                      int button_pin_3, int potentiometer_pin,
+                                      int button_pin, int potentiometer_pin,
                                       int minimum_velocity, int maximum_velocity,
                                       int bound)
 {
@@ -131,13 +130,10 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
   this->motor_pin_3 = motor_pin_3;
   this->motor_pin_4 = motor_pin_4;
 
-  this->button_pin_1 = button_pin_1;
-  this->button_pin_2 = button_pin_2;
-  this->button_pin_3 = button_pin_3;
+  this->button_pin = button_pin;
 
   this->potentiometer_pin = potentiometer_pin;
 
-  this->mode = 0;
   this->counter = 0;
   this->minimum_velocity = minimum_velocity;
   this->maximum_velocity = maximum_velocity;
@@ -152,9 +148,7 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2,
   pinMode(this->motor_pin_3, OUTPUT);
   pinMode(this->motor_pin_4, OUTPUT);
 
-  pinMode(this->button_pin_1, INPUT_PULLUP);
-  pinMode(this->button_pin_2, INPUT_PULLUP);
-  pinMode(this->button_pin_3, INPUT_PULLUP);
+  pinMode(this->button_pin, INPUT_PULLUP);
 
   this->outputPerc = 100;
 
@@ -278,23 +272,10 @@ void Stepper::step(int steps_to_move)
         stepMotor(this->step_number % 4);
 
       this->lastButtonState = this->currentButtonState;
-      this->currentButtonState = digitalRead(button_pin_3);
-
-      /*
-      if (digitalRead(button_pin_1) == LOW)   // not used
-      {
-        this->mode = 0;
-      }
-
-      if (digitalRead(button_pin_2) == LOW)   // not used
-      {
-        this->mode = 1;
-      }
-      */
+      this->currentButtonState = digitalRead(button_pin);
 
       if (this->lastButtonState == HIGH && this->currentButtonState == LOW) 
       {
-        this->mode = 2;
         this->counter++;
 
         if (this->counter > 1) 
@@ -330,11 +311,10 @@ void Stepper::step(int steps_to_move)
     this->last_step_time = now;
 
     this->lastButtonState = this->currentButtonState;
-    this->currentButtonState = digitalRead(button_pin_3);
+    this->currentButtonState = digitalRead(button_pin);
 
     if (this->lastButtonState == HIGH && this->currentButtonState == LOW) 
     {
-      this->mode = 2;
       this->counter++;
 
       if (this->counter > 1) 
@@ -345,16 +325,16 @@ void Stepper::step(int steps_to_move)
   }
 }
 
-/*
-    0   1   2   3   0   1   2   3   0   1 
-1 ----________--------________--------____
-2 ____--------________--------________----
-
-3 --------________--------________--------
-4 ________--------________--------________
-*/
 void Stepper::handleDutyCycleMotor(int thisStep)
 {
+  /*
+      0   1   2   3   0   1   2   3   0   1 
+  1 ----________--------________--------____
+  2 ____--------________--------________----
+
+  3 --------________--------________--------
+  4 ________--------________--------________
+  */
   if (this->pin_count == 4)
   {
     switch (thisStep) {
@@ -538,22 +518,21 @@ int Stepper::version(void)
   return 5;
 }
 
-int Stepper::getMode(void) 
-{
-  return mode;
-}
 int Stepper::getStep(void) 
 {
   return step_number;
 }
+
 int Stepper::getCounter(void) 
 {
   return counter;
 }
+
 void Stepper::setCounter(int cntr) 
 {
   counter = cntr;
 }
+
 void Stepper::setOutputPercentage(byte perc)
 {
   outputPerc = perc;
